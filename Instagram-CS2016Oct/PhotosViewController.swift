@@ -10,12 +10,14 @@ import UIKit
 import AFNetworking
 
 
-class PhotosViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+class PhotosViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UIScrollViewDelegate {
 
     @IBOutlet weak var tableView: UITableView!
     
     var photos:[NSDictionary] = []
-    
+    var isMoreDataLoading = false
+    let loadingView = UIActivityIndicatorView(activityIndicatorStyle: .gray)
+
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
@@ -26,6 +28,12 @@ class PhotosViewController: UIViewController, UITableViewDataSource, UITableView
         refreshControl.addTarget(self, action: #selector(refreshControlAction(_:)), for: UIControlEvents.valueChanged)
         tableView.insertSubview(refreshControl, at: 0)
 
+        
+        let tableFooterView = UIView(frame: CGRect(x: 0, y: 0, width: 320, height: 50))
+        loadingView.startAnimating()
+        loadingView.center = tableFooterView.center
+        tableFooterView.addSubview(loadingView)
+        tableView.tableFooterView = tableFooterView
 
     }
 
@@ -57,6 +65,41 @@ class PhotosViewController: UIViewController, UITableViewDataSource, UITableView
                             if let photoData = responseDictionary["data"] as? [NSDictionary] {
                                 self.photos = photoData
                                 self.tableView.reloadData()
+//                                self.refreshControl.endRefreshing()
+                            }
+                        }
+                    }
+            })
+            task.resume()
+        }
+    }
+
+    func loadMorePhotos(){
+        let accessToken = "435569061.c66ada7.d12d19c8687e427591f254586e4f3e47"
+        let userId = "435569061"
+        let url = URL(string: "https://api.instagram.com/v1/users/\(userId)/media/recent/?access_token=\(accessToken)")
+        if let url = url {
+            let request = URLRequest(
+                url: url,
+                cachePolicy: NSURLRequest.CachePolicy.reloadIgnoringLocalCacheData,
+                timeoutInterval: 10)
+            let session = URLSession(
+                configuration: URLSessionConfiguration.default,
+                delegate: nil,
+                delegateQueue: OperationQueue.main)
+            let task = session.dataTask(
+                with: request,
+                completionHandler: { (dataOrNil, response, error) in
+                    if let data = dataOrNil {
+                        if let responseDictionary = try! JSONSerialization.jsonObject(with: data, options: []) as? NSDictionary {
+                            print("response: \(responseDictionary)")
+                            if let photoData = responseDictionary["data"] as? [NSDictionary] {
+                                self.photos += photoData
+                                self.isMoreDataLoading = false
+                                
+                                // Stop the loading indicator
+                                self.loadingView.stopAnimating()
+                                self.tableView.reloadData()
                                 //self.refreshControl.endRefreshing()
                             }
                         }
@@ -65,6 +108,7 @@ class PhotosViewController: UIViewController, UITableViewDataSource, UITableView
             task.resume()
         }
     }
+
     
     func refreshControlAction(_ refreshControl: UIRefreshControl) {
         let accessToken = "435569061.c66ada7.d12d19c8687e427591f254586e4f3e47"
@@ -83,6 +127,7 @@ class PhotosViewController: UIViewController, UITableViewDataSource, UITableView
             let task = session.dataTask(
                 with: request,
                 completionHandler: { (dataOrNil, response, error) in
+                    self.isMoreDataLoading = false
                     if let data = dataOrNil {
                         if let responseDictionary = try! JSONSerialization.jsonObject(with: data, options: []) as? NSDictionary {
                             print("response: \(responseDictionary)")
@@ -148,7 +193,12 @@ class PhotosViewController: UIViewController, UITableViewDataSource, UITableView
         let label = UILabel(frame: CGRect(x: 50, y: 10, width: 150, height: 30))
         label.text = username
         headerView.addSubview(label)
+        
+        
         return headerView
+        
+        
+        
     }
     
     
@@ -161,11 +211,29 @@ class PhotosViewController: UIViewController, UITableViewDataSource, UITableView
     }
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        var vc = segue.destination as! PhotoDetailsViewController
+        let vc = segue.destination as! PhotoDetailsViewController
         var indexPath = tableView.indexPath(for: sender as! UITableViewCell)!
         let urlImages = photos[indexPath.section].value(forKeyPath: "images.standard_resolution.url")as! String
         vc.photoUrl = urlImages
     }
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        if (!isMoreDataLoading) {
+           
+            let scrollViewContentHeight = tableView.contentSize.height
+            let scrollOffsetThreshold = scrollViewContentHeight - tableView.bounds.size.height
+            
+            if(scrollView.contentOffset.y > scrollOffsetThreshold && tableView.isDragging) {
+                isMoreDataLoading = true
+                loadMorePhotos()
+            }
+            
+            
+        }
+    }
+    
+    
+    
     
 }
 

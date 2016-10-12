@@ -1,30 +1,32 @@
 //
-//  PhotoDetailsViewController.swift
+//  FullScreenPhotoViewController.swift
 //  Instagram-CS2016Oct
 //
-//  Created by Liem Ly Quan on 10/12/16.
+//  Created by Pj on 10/12/16.
 //  Copyright © 2016 coderschool. All rights reserved.
 //
 
 import UIKit
-import AFNetworking
-class PhotoDetailsViewController: UIViewController {
-    @IBOutlet weak var photoImageView: UIImageView!
 
-    var photoUrl:String!
+class FullScreenPhotoViewController: UIViewController, UIScrollViewDelegate {
+
     
+    @IBOutlet weak var imgZoom: UIImageView!
+    var photo: UIImage!
     override func viewDidLoad() {
-        
         super.viewDidLoad()
-        photoImageView.setImageWith(URL(string: photoUrl)!)
+        
+        imgZoom.image = photo
         // Do any additional setup after loading the view.
-        let tap = UITapGestureRecognizer(target: self, action: #selector(zoom))
-        self.photoImageView.addGestureRecognizer(tap)
     }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
+    }
+    
+    func viewForZooming(in scrollView: UIScrollView) -> UIView? {
+        return imgZoom
     }
     
 
@@ -37,15 +39,5 @@ class PhotoDetailsViewController: UIViewController {
         // Pass the selected object to the new view controller.
     }
     */
-    
-    
-    func zoom(){
-        performSegue(withIdentifier: "zoomSegue", sender: photoImageView)
-    }
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        let vc = segue.destination as! FullScreenPhotoViewController
-       
-        vc.photo = self.photoImageView.image
-    }
 
 }
