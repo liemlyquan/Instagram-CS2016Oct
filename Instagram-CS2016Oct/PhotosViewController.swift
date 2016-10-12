@@ -101,15 +101,20 @@ class PhotosViewController: UIViewController, UITableViewDataSource, UITableView
     
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return 1
+    }
+    
+    func numberOfSections(in tableView: UITableView)
+        -> Int {
         return photos.count
+
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "PhotosTableViewCell") as! PhotosTableViewCell
         
-//        let urlImages = photos[indexPath.row].value(forKeyPath: "images.standard_resolution.url") as! String
-        let urlImages = photos[indexPath.row]["images"] as! NSDictionary
+        let urlImages = photos[indexPath.section]["images"] as! NSDictionary
         let standarRes = urlImages["standard_resolution"] as! NSDictionary
         let urlString = standarRes["url"] as! String
         
@@ -119,6 +124,38 @@ class PhotosViewController: UIViewController, UITableViewDataSource, UITableView
         return cell
     }
     
+    
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        let headerView = UIView(frame: CGRect(x: 0, y: 0, width: 320, height: 50))
+        headerView.backgroundColor = UIColor(white: 1, alpha: 0.9)
+        
+        let profileView = UIImageView(frame: CGRect(x: 10, y: 10, width: 30, height: 30))
+        profileView.clipsToBounds = true
+        profileView.layer.cornerRadius = 15
+        profileView.layer.borderColor = UIColor(white: 0.7, alpha: 0.8).cgColor
+        profileView.layer.borderWidth = 1
+        
+        let urlString = photos[section].value(forKeyPath: "user.profile_picture") as! String
+        let username = photos[section].value(forKeyPath: "user.username") as! String
+        
+        
+        profileView.setImageWith(URL(string: urlString)!)
+        
+        headerView.addSubview(profileView)
+        
+        // Add a UILabel for the username here
+        
+        let label = UILabel(frame: CGRect(x: 50, y: 10, width: 150, height: 30))
+        label.text = username
+        headerView.addSubview(label)
+        return headerView
+    }
+    
+    
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 50
+    }
+    
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
     }
@@ -126,7 +163,7 @@ class PhotosViewController: UIViewController, UITableViewDataSource, UITableView
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         var vc = segue.destination as! PhotoDetailsViewController
         var indexPath = tableView.indexPath(for: sender as! UITableViewCell)!
-        let urlImages = photos[indexPath.row].value(forKeyPath: "images.standard_resolution.url")as! String
+        let urlImages = photos[indexPath.section].value(forKeyPath: "images.standard_resolution.url")as! String
         vc.photoUrl = urlImages
     }
     

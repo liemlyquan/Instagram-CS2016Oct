@@ -23,11 +23,11 @@
                                         <rect key="frame" x="0.0" y="92" width="320" height="320"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="DNi-13-tlK" id="bff-KH-Gir">
-                                            <frame key="frameInset" width="287" height="319"/>
+                                            <frame key="frameInset" width="320" height="319"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" id="vgB-sp-XkP">
-                                                    <frame key="frameInset" minX="8" minY="70" width="304" height="236"/>
+                                                    <frame key="frameInset" minY="30" width="320" height="290"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                 </imageView>
                                             </subviews>
@@ -49,7 +49,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="659.5" y="135.5"/>
+            <point key="canvasLocation" x="659" y="135"/>
         </scene>
         <!--Photo Details View Controller-->
         <scene sceneID="htf-4R-dE9">
