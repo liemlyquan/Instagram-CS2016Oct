@@ -79,5 +79,12 @@ class PhotosViewController: UIViewController, UITableViewDataSource, UITableView
         return cell
     }
 
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        var vc = segue.destination as! PhotoDetailsViewController
+        var indexPath = tableView.indexPath(for: sender as! UITableViewCell)!
+        let urlImages = photos[indexPath.row].value(forKeyPath: "images.standard_resolution.url")as! String
+        vc.photoUrl = urlImages
+    }
+    
 }
 
